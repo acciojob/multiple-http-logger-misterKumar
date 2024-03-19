@@ -8,35 +8,29 @@ const urls = [
 // Write your code here
 
 // Function to make an HTTP request and return the response JSON
-async function fetchUrl(url) {
+async function fetchData(url) {
   try {
     const response = await fetch(url);
-    if (response.ok) {
-      const data = await response.json();
-      return { url, data };
-    } else {
-      return { url, error: `Error fetching ${url}: ${response.status} - ${response.statusText}` };
+    if (!response.ok) {
+      throw new Error(`Network response was not ok for ${url}`);
     }
+    const data = await response.json();
+    return data;
   } catch (error) {
-    return { url, error: `Error fetching ${url}: ${error.message}` };
+    console.error(`Error fetching data from ${url}:`, error);
+    return null;
   }
 }
 
-// Function to fetch all URLs and log the responses
-async function fetchAllUrls(urls) {
-  try {
-    const responses = await Promise.all(urls.map(fetchUrl));
-    responses.forEach((response) => {
-      if (response.error) {
-        console.error(response.error);
-      } else {
-        console.log(`Response from ${response.url}:`, response.data);
-      }
-    });
-  } catch (error) {
-    console.error(error.message);
+// Function to process each URL
+async function processUrls() {
+  for (const url of urls) {
+    const data = await fetchData(url);
+    if (data) {
+      console.log(`Response from ${url}:`, data);
+    }
   }
 }
 
-// Start fetching the URLs
-fetchAllUrls(urls);
+// Call the function to start fetching data
+processUrls();
